@@ -20,14 +20,14 @@ if user_input:
             if is_gps:
                 lat, lon = val1, val2
                 itm_x, itm_y = to_itm.transform(lon, lat)
-                input_label = "WGS84 (GPS)"
+                grid_name = "WGS84 (GPS)"
             else:
                 itm_x, itm_y = val1, val2
                 lon, lat = to_wgs.transform(itm_x, itm_y)
-                input_label = "ITM (Israel New Grid)"
+                grid_name = "ITM (Israel New Grid)"
 
-            # Uniform Presentation
-            st.info(f"Input: **{input_label}**")
+            # Uniform Display
+            st.info(f"Input Detected: **{grid_name}**")
             
             st.subheader("📋 Uniform Results")
             c_a, c_b = st.columns(2)
@@ -39,31 +39,27 @@ if user_input:
                 st.code(f"{int(itm_x)}, {int(itm_y)}")
 
             st.divider()
-            st.write("### 🗺️ Map Links (with Markers)")
+            st.write("### 🗺️ Open Maps")
             
-            # --- THE NEW LINK ENGINE ---
+            # --- THE "FORCE" PARAMETERS ---
+            # Caltopo: 'point' creates a temporary red dot that is harder to ignore than 'marker'
+            cal_url = f"https://caltopo.com/map.html#ll={lat},{lon}&z=15&point={lat},{lon}"
             
-            # CALTOPO: 'll' for lat/lon, 'z' for zoom, 'marker' for the pin
-            cal_url = f"https://caltopo.com/map.html#ll={lat},{lon}&z=15&marker={lat},{lon}"
+            # Amud Anan: The 'p' parameter is the official "shared point" trigger
+            aa_url = f"https://amudanan.co.il/?p={lat},{lon}"
             
-            # AMUD ANAN: Marker 1 must be present for the blue pin
-            aa_url = f"https://amudanan.co.il/?marker=1&lon={lon}&lat={lat}"
-            
-            # GOVMAP: Using 'q' (Query) to force the red search marker
-            gm_url = f"https://www.govmap.gov.il/?q={int(itm_x)},{int(itm_y)}&z=10"
-            
-            # WAZE: Reliable navigation pin
+            # Waze: Always works with markers
             wz_url = f"https://waze.com/ul?ll={lat},{lon}&navigate=yes"
 
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
             with col1:
                 st.link_button("🏔️ Caltopo", cal_url, use_container_width=True)
-                st.link_button("☁️ Amud Anan", aa_url, use_container_width=True)
             with col2:
-                st.link_button("🌐 GovMap Israel", gm_url, use_container_width=True)
+                st.link_button("☁️ Amud Anan", aa_url, use_container_width=True)
+            with col3:
                 st.link_button("🚗 Waze", wz_url, use_container_width=True)
                 
     except:
         st.error("Invalid input. Please enter numbers only.")
 
-st.caption("MemirHaHaV1 | Caltopo + Grid Sync")
+st.caption("MemirHaHaV1 | Marker Sync Engine")
