@@ -34,15 +34,15 @@ if user_input:
             c1, c2 = st.columns(2)
             
             with c1:
-                # FIX: Israel Hiking Map (Marker must come after 'marker=' in the hash)
+                # FIX: Israel Hiking Map 2025 (Marker needs to be first in the hash)
                 st.link_button("🇮🇱 Israel Hiking Map", f"https://israelhiking.osm.org.il/#/?marker={lat},{lon}")
                 
-                # FIX: Amud Anan (Needs lon, lat and marker=1)
+                # FIX: Amud Anan (Needs marker=1 AND specific lon/lat)
                 st.link_button("☁️ Amud Anan", f"https://amudanan.co.il/?lon={lon}&lat={lat}&marker=1")
             
             with c2:
-                # FIX: GovMap (Must use ?c= with ITM coordinates for perfect accuracy)
-                st.link_button("🌐 GovMap Israel", f"https://www.govmap.gov.il/?c={int(itm_x)},{int(itm_y)}&z=10")
+                # FIX: GovMap (Needs both 'c' for center and 'q' for a search marker)
+                st.link_button("🌐 GovMap Israel", f"https://www.govmap.gov.il/?c={int(itm_x)},{int(itm_y)}&q={int(itm_x)},{int(itm_y)}&z=10")
                 
                 # Waze (Reliable)
                 st.link_button("🚗 Waze", f"https://waze.com/ul?ll={lat},{lon}&navigate=yes")
