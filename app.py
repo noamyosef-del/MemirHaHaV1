@@ -2,14 +2,14 @@ import streamlit as st
 from pyproj import Transformer
 import pandas as pd
 
-# הגדרת התמרות
+# התמרת קואורדינטות
 to_wgs = Transformer.from_crs("epsg:2039", "epsg:4326", always_xy=True)
 to_itm = Transformer.from_crs("epsg:4326", "epsg:2039", always_xy=True)
 
 st.set_page_config(page_title="MemirHaHaV1", page_icon="📍", layout="wide")
-st.title("📍 MemirHaHaV1 - Final Mission")
+st.title("📍 MemirHaHaV1 - הניסיון המנצח")
 
-user_input = st.text_input("הדבק קואורדינטות (WGS84 או ITM):", placeholder="31.28392, 34.67544")
+user_input = st.text_input("הדבק קואורדינטות (GPS או רשת ישראל):", placeholder="31.28392, 34.67544")
 
 if user_input:
     try:
@@ -25,31 +25,29 @@ if user_input:
                 itm_y = v2 if itm_x == v1 else v1
                 lon, lat = to_wgs.transform(itm_x, itm_y)
 
-            # תצוגה פנימית
             st.success(f"TARGET: {lat:.6f}, {lon:.6f}")
             st.map(pd.DataFrame({'lat': [lat], 'lon': [lon]}), zoom=14)
 
             st.divider()
 
-            # --- הקישורים שעובדים ב-PC (בדיקה ידנית) ---
+            # --- הקישורים בפורמט "שיתוף" (הכי אמינים ב-PC) ---
 
-            # 1. Israel Hiking Map - הפתרון ל-PC: שימוש בפרמטר /points/ בתוך ה-Path
-            # זה יוצר שכבה זמנית עם סיכה כחולה
-            ihm_url = f"https://israelhiking.osm.org.il/map/16/{lat}/{lon}/points/{lat}/{lon}"
+            # 1. Israel Hiking Map - שימוש בפורמט ה-Share היציב ביותר
+            ihm_url = f"https://israelhiking.osm.org.il/share/Point/{lat}/{lon}/Target"
 
-            # 2. Caltopo - הפתרון ל-PC: שימוש ב-Search עם Marker מוצמד
-            cal_url = f"https://caltopo.com/search?q={lat},{lon}"
+            # 2. Caltopo - שימוש בפורמט ה-URL הישן (שעדיין עובד הכי טוב עם סיכות)
+            cal_url = f"https://caltopo.com/map.html#ll={lat},{lon}&z=16&marker={lat},{lon}"
 
-            # 3. Amud Anan - p= (תמיד עובד)
-            aa_url = f"https://amudanan.co.il/?p={lat},{lon}"
-            
-            # 4. Google Maps - עם Marker אדום (הפורמט הרשמי)
+            # 3. Google Maps - פורמט ה-Place המכריח סיכה
             gm_url = f"https://www.google.com/maps/search/?api=1&query={lat},{lon}"
 
-            # 5. Govmap - רשת ישראל הרשמית
+            # 4. Amud Anan - הקישור הישיר
+            aa_url = f"https://amudanan.co.il/?p={lat},{lon}"
+
+            # 5. Govmap - הפורמט ששם X על המפה
             gov_url = f"https://www.govmap.gov.il/?q={lat},{lon}&z=10"
 
-            st.write("### 🚀 קליק אחד לסיכה:")
+            st.write("### 🚀 נסה עכשיו (קליק אחד):")
             c1, c2, c3, c4, c5 = st.columns(5)
             c1.link_button("🥾 IHM", ihm_url, use_container_width=True)
             c2.link_button("🏔️ Caltopo", cal_url, use_container_width=True)
@@ -60,4 +58,4 @@ if user_input:
     except:
         st.error("Error")
 
-st.caption("MemirHaHaV1 | PC Compatible | Zero-Step Markers")
+st.caption("MemirHaHaV1 | PC Stability Mode")
