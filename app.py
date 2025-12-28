@@ -6,17 +6,17 @@ import pandas as pd
 to_wgs = Transformer.from_crs("epsg:2039", "epsg:4326", always_xy=True)
 to_itm = Transformer.from_crs("epsg:4326", "epsg:2039", always_xy=True)
 
-st.set_page_config(page_title="MemirHaHaV1", page_icon="📍", layout="wide")
-st.title("📍 MemirHaHaV1")
+st.set_page_config(page_title="MemirHaHaV1 - Pro", page_icon="📍", layout="wide")
+st.title("📍 MemirHaHaV1 - Expert Final Build")
 
-user_input = st.text_input("הדבק קואורדינטות (GPS או רשת ישראל):", placeholder="31.28392, 34.67544")
+user_input = st.text_input("הדבק קואורדינטות:", placeholder="31.28392, 34.67544")
 
 if user_input:
     try:
         parts = [float(n) for n in user_input.replace(',', ' ').split()]
         if len(parts) == 2:
             v1, v2 = parts
-            # לוגיקת Swap חכמה לישראל
+            # לוגיקת Auto-Swap (מותאמת לישראל)
             if 25 < v1 < 40 or 25 < v2 < 40:
                 lat = v1 if 28 < v1 < 35 else v2
                 lon = v2 if lat == v1 else v1
@@ -25,37 +25,46 @@ if user_input:
                 itm_y = v2 if itm_x == v1 else v1
                 lon, lat = to_wgs.transform(itm_x, itm_y)
 
-            st.success(f"מיקום: {lat:.6f}, {lon:.6f}")
-            st.map(pd.DataFrame({'lat': [lat], 'lon': [lon]}), zoom=14)
+            st.success(f"TARGET: {lat:.6f}, {lon:.6f}")
+            
+            # --- הפיצוחים הטכנולוגיים לסיכה ב-PC ---
 
-            st.divider()
-
-            # --- הפיצוחים הסופיים לסיכות ב-PC ---
-
-            # 1. Google Maps - עובד תמיד
-            gm_url = f"https://www.google.com/maps/search/?api=1&query={lat},{lon}"
-
-            # 2. Waze - עובד תמיד
-            wz_url = f"https://waze.com/ul?ll={lat},{lon}&navigate=yes"
-
-            # 3. Israel Hiking Map (IHM) - שימוש בפרמטר /points/ בתוך הנתיב
-            # ב-PC זה הפורמט הכי יציב ליצירת סמן כחול
+            # 1. Israel Hiking Map - פורמט ה-"Points" החדש
+            # הוספת /points/ בסוף הנתיב היא הדרך היחידה להזרקת אובייקט ב-PC
             ihm_url = f"https://israelhiking.osm.org.il/map/15/{lat}/{lon}/points/{lat}/{lon}"
 
-            # 4. Caltopo - תיקון ה-404
-            # השימוש ב-map.html דורש שה-Hash (#) יתחיל ב-ll. הסרנו את ה-Search שגרם לשגיאה.
+            # 2. Caltopo - שימוש ב-Marker בתוך ה-Hash בסדר ספציפי למניעת 404
+            # ה-ll חייב להיות ראשון וה-marker חייב להיות זהה לו
             cal_url = f"https://caltopo.com/map.html#ll={lat},{lon}&z=16&marker={lat},{lon}"
 
-            # 5. עמוד ענן - הוספת פרמטר "L" (Label) שלפעמים עוזר ל-PC להציג את הנקודה
-            aa_url = f"https://amudanan.co.il/?p={lat},{lon}&L={lat},{lon}"
+            # 3. עמוד ענן - הוספת פרמטר p ומיקום מרכזי
+            aa_url = f"https://amudanan.co.il/?p={lat},{lon}"
 
-            st.write("### 🚀 קישורים (בדיקה חוזרת):")
-            c1, c2, c3, c4, c5 = st.columns(5)
-            c1.link_button("🌐 Google", gm_url, use_container_width=True)
-            c2.link_button("🚗 Waze", wz_url, use_container_width=True)
-            c3.link_button("🥾 IHM", ihm_url, use_container_width=True)
-            c4.link_button("🏔️ Caltopo", cal_url, use_container_width=True)
-            c5.link_button("☁️ עמוד ענן", aa_url, use_container_width=True)
+            # 4. Google Maps - שימוש ב-API הרשמי להצגת Marker
+            gm_url = f"https://www.google.com/maps/search/?api=1&query={lat},{lon}"
 
-    except:
-        st.error("שגיאה בעיבוד הקואורדינטות")
+            # 5. Waze - פורמט הניווט היציב
+            wz_url = f"https://waze.com/ul?ll={lat},{lon}&navigate=yes"
+
+            st.write("### 🚀 קישורים מותאמי PC (עם סיכה):")
+            cols = st.columns(5)
+            data = [
+                ("🥾 IHM", ihm_url),
+                ("🏔️ Caltopo", cal_url),
+                ("☁️ עמוד ענן", aa_url),
+                ("🌐 Google", gm_url),
+                ("🚗 Waze", wz_url)
+            ]
+            
+            for i, (label, url) in enumerate(data):
+                cols[i].link_button(label, url, use_container_width=True)
+
+            # תצוגה מהירה לווידוא
+            st.divider()
+            st.write("#### 🗺️ תצוגה מהירה (Preview)")
+            st.map(pd.DataFrame({'lat': [lat], 'lon': [lon]}), zoom=14)
+
+    except Exception as e:
+        st.error(f"שגיאה: {e}")
+
+st.caption("MemirHaHaV1 | Expert Panel Final Version | Built for Windows 10")
